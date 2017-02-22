@@ -22,6 +22,7 @@ exports.getLogin = (req, res) => {
  * Sign in using email and password.
  */
 exports.postLogin = (req, res, next) => {
+
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
@@ -29,18 +30,28 @@ exports.postLogin = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
+    console.log(errors);
     req.flash('errors', errors);
     return res.redirect('/login');
   }
 
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return next(err); }
+    if (err) {
+      console.log(err);
+      return next(err);
+
+    }
     if (!user) {
       req.flash('errors', info);
       return res.redirect('/login');
     }
     req.logIn(user, (err) => {
-      if (err) { return next(err); }
+      if (err) {
+
+        console.log(err)
+        return next(err);
+      }
+      console.log(req.session);
       req.flash('success', { msg: 'Success! You are logged in.' });
       res.redirect(req.session.returnTo || '/');
     });
@@ -82,6 +93,7 @@ exports.postSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
+    console.log(errors);
     req.flash('errors', errors);
     return res.redirect('/signup');
   }
@@ -92,17 +104,26 @@ exports.postSignup = (req, res, next) => {
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
-    if (err) { return next(err); }
+    if (err) {
+      console.log(err);
+      return next(err);
+    }
     if (existingUser) {
+      console.log('Existing user');
       req.flash('errors', { msg: 'Account with that email address already exists.' });
       return res.redirect('/signup');
     }
     user.save((err) => {
-      if (err) { return next(err); }
+      if (err) {
+        console.log(err);
+        return next(err);
+      }
       req.logIn(user, (err) => {
         if (err) {
+          console.log(err);
           return next(err);
         }
+        console.log('Saved user');
         res.redirect('/');
       });
     });
@@ -114,6 +135,7 @@ exports.postSignup = (req, res, next) => {
  * Profile page.
  */
 exports.getAccount = (req, res) => {
+  console.log('user: '+ req.user )
   res.render('account/profile', {
     title: 'Account Management'
   });
@@ -186,8 +208,11 @@ exports.postUpdatePassword = (req, res, next) => {
  * Delete user account.
  */
 exports.postDeleteAccount = (req, res, next) => {
+  console.log('postDeleteAccount called');
   User.remove({ _id: req.user.id }, (err) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     req.logout();
     req.flash('info', { msg: 'Your account has been deleted.' });
     res.redirect('/');

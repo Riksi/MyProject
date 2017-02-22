@@ -173,11 +173,11 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 
 //MY ADDITIONS
 /*****************************************/
-app.get('/collections', collectionController.getCollections);
-app.post('/collections', collectionController.addCollection);
-app.get('/collections/:id/edit', collectionController.getCollection);
-app.put('/collections/:id/edit', collectionController.editCollection);
-app.delete('/collections/:id/delete', collectionController.eraseCollection);
+app.get('/collections', passportConfig.isAuthenticated, collectionController.getCollections);
+app.post('/collections', passportConfig.isAuthenticated, collectionController.addCollection);
+app.get('/collections/:id/edit', passportConfig.isAuthenticated, collectionController.getCollection);
+app.put('/collections/:id/edit', passportConfig.isAuthenticated, collectionController.editCollection);
+app.delete('/collections/:id/delete', passportConfig.isAuthenticated, collectionController.eraseCollection);
 
 
 app.get('/collections/:id/items/:item_id/edit',itemController.getItem);
@@ -250,7 +250,6 @@ app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRed
  * Error Handler.
  */
 app.use(errorHandler());
-
 /**
  * Start Express server.
  */

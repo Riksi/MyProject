@@ -48,7 +48,8 @@ exports.addCollection = (req, res) => {
 		params = {
 			name: req.body.name,
 			description: req.body.description,
-			tags: req.body.tags
+			tags: req.body.tags,
+			user: req.user
 		}
 		const collection = new Collection(params);
 		collection.save((err,collection) => {
@@ -107,7 +108,9 @@ exports.editCollection = (req, res) => {
 			tags: req.body.tags
 		}
 
-		Collection.findByIdAndUpdate(id,{$set: params},
+		Collection.findByIdAndUpdate(
+			id,
+			{$set: params},
 			(err, previous) => {
 				if(err){
 					console.log(err);
